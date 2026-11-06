@@ -4,6 +4,7 @@
 ## Author: HexToolFactory
 ## Version: @project-version@
 ## Category: Combat
+## X-Curse-Project-ID: 1787411
 ## OptionalDeps: WeakAuras
 ## SavedVariables: ThreatOnNameplateDB
 ## DefaultState: Enabled
