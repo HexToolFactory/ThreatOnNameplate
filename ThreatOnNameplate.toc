@@ -1,0 +1,12 @@
+## Interface: 16001
+## Title: Threat On Nameplate
+## Notes: Threat indicator on every enemy nameplate (WoW: Forever). Target: threat difference in points; other mobs: your % of aggro. /tonp
+## Author: HexToolFactory
+## Version: @project-version@
+## Category: Combat
+## OptionalDeps: WeakAuras
+## SavedVariables: ThreatOnNameplateDB
+## DefaultState: Enabled
+
+ThreatOnNameplate.lua
+Nameplates.lua
