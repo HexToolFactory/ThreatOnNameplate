@@ -50,6 +50,33 @@ local function newHalf(holder, color, point)
   return half
 end
 
+-- Other addons pin icons to the left of the plate, e.g. Questie's quest-objective icon (loot sack, sword, ...): an
+-- unnamed child frame of the nameplate with the fields .Icon and .lastIcon. The indicator docks left of such an icon
+-- instead of being drawn underneath it.
+local TEXT_ZONE = 50                         -- room the number needs left of the plate / bar (nameplate pixels)
+
+local function sideIcon(plate, holder)
+  for _, child in ipairs({ plate:GetChildren() }) do
+    if child ~= holder and child.lastIcon ~= nil and child.Icon and child:IsShown() then return child end
+  end
+end
+
+-- how far the indicator has to move left (holder units, <= 0) so that it ends just left of such an icon
+local function dockShift(plate, anchor, holder)
+  local ok, shift = pcall(function()
+    local icon = sideIcon(plate, holder)
+    if not icon then return 0 end
+    local il, ir, al = icon:GetLeft(), icon:GetRight(), anchor:GetLeft()
+    if not (il and ir and al) or isSecret(il) or isSecret(ir) or isSecret(al) then return 0 end
+    local is, hs = icon:GetEffectiveScale(), holder:GetEffectiveScale()
+    local right = al * anchor:GetEffectiveScale() - GAP_TO_PLATE * hs     -- where the indicator normally ends (screen px)
+    local zone = ((showBar() and BAR_WIDTH + 4 or 0) + TEXT_ZONE) * hs    -- what it covers to the left of that
+    if il * is >= right or ir * is <= right - zone then return 0 end    -- the icon is somewhere else
+    return (il * is - 2 * hs - right) / hs
+  end)
+  return (ok and type(shift) == "number") and shift or 0
+end
+
 local function getWidget(plate, anchor)
   local w = widgets[plate]
   if not w then
@@ -79,7 +106,7 @@ local function getWidget(plate, anchor)
     widgets[plate] = w
   end
   w.holder:ClearAllPoints()
-  w.holder:SetPoint("RIGHT", anchor, "LEFT", -GAP_TO_PLATE, 0)
+  w.holder:SetPoint("RIGHT", anchor, "LEFT", -GAP_TO_PLATE + dockShift(plate, anchor, w.holder), 0)
   local withBar = showBar()
   w.bar:SetShown(withBar)
   w.text:ClearAllPoints()
